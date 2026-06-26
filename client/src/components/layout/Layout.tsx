@@ -1,6 +1,7 @@
-import { useAnalyze } from '../../hooks/useAnalyze';
+﻿import { useAnalyze } from '../../hooks/useAnalyze';
 import StateRouter from './StateRouter';
 import DebugPanel from '../debug/DebugPanel';
+import { IS_MOCK, MOCK_BANNER_TEXT } from '../../config';
 
 export default function Layout() {
   const { state, actions } = useAnalyze();
@@ -18,18 +19,31 @@ export default function Layout() {
               <p className="text-xs text-gray-500">简历 ATS 兼容性分析工具</p>
             </div>
           </div>
-          <button
-            onClick={actions.toggleDebug}
-            className="text-xs text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-          >
-            {state.debugEnabled ? '关闭调试' : '调试'}
-          </button>
+          {!import.meta.env.PROD && (
+            <button
+              onClick={actions.toggleDebug}
+              className="text-xs text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+            >
+              {state.debugEnabled ? '关闭调试' : '调试'}
+            </button>
+          )}
         </div>
       </header>
+
+      {/* Mock demo banner */}
+      {IS_MOCK && (
+        <div className="border-b bg-amber-50/60">
+          <div className="max-w-4xl mx-auto px-6 py-1.5 text-xs text-amber-700 text-center">
+            {MOCK_BANNER_TEXT}
+          </div>
+        </div>
+      )}
+
       <main className="max-w-4xl mx-auto px-6 py-8">
         <StateRouter state={state} actions={actions} />
       </main>
-      {state.debugEnabled && (
+
+      {!import.meta.env.PROD && state.debugEnabled && (
         <DebugPanel state={state} onClose={actions.toggleDebug} />
       )}
     </div>

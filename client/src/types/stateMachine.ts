@@ -1,4 +1,4 @@
-import type { AnalysisResult, AppError } from './index';
+﻿import type { AnalysisResult, AppError } from './index';
 
 export type MachineStatus =
   | 'idle'
@@ -41,6 +41,7 @@ export interface MachineState {
   successCount: number;
   failureCount: number;
   disconnectCount: number;
+  analysisStage: number;        // 0=idle, 1=parsing, 2=keywords, 3=ats, 4=suggestions
 }
 
 export type MachineAction =
@@ -59,7 +60,8 @@ export type MachineAction =
   | { type: 'USER_ABORT' }
   | { type: 'USER_RESET' }
   | { type: 'CIRCUIT_BREAKER_OPEN'; until: number }
-  | { type: 'TOGGLE_DEBUG' };
+  | { type: 'TOGGLE_DEBUG' }
+  | { type: 'SET_ANALYSIS_STAGE'; stage: number };
 
 export function createInitialState(): MachineState {
   return {
@@ -83,5 +85,6 @@ export function createInitialState(): MachineState {
     successCount: 0,
     failureCount: 0,
     disconnectCount: 0,
+    analysisStage: 0,
   };
 }

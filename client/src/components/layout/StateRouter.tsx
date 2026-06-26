@@ -1,4 +1,4 @@
-import type { MachineState } from '../../types';
+﻿import type { MachineState } from '../../types';
 import FileUploader from '../upload/FileUploader';
 import FilePreview from '../upload/FilePreview';
 import JobDescriptionInput from '../upload/JobDescriptionInput';
@@ -45,18 +45,32 @@ export default function StateRouter({ state, actions }: StateRouterProps) {
     case 'idle':
       return (
         <div className="space-y-6">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">上传简历，获取 ATS 分析报告</h2>
-            <p className="text-gray-500">支持 PDF、DOCX、TXT 格式</p>
+          {/* Hero Section */}
+          <div className="text-center mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">
+              用 AI 优化你的简历
+            </h1>
+            <p className="text-gray-500 max-w-xl mx-auto leading-relaxed text-sm md:text-base">
+              上传简历，AI 自动分析 ATS 兼容性，检测关键词匹配度，
+              <br className="hidden sm:block" />
+              帮你提升面试通过率
+            </p>
           </div>
+
+          {/* 3-step flow */}
+          {!state.file && <EmptyState />}
+
+          {/* Upload */}
           <FileUploader file={state.file} onFile={actions.setFile} />
+
+          {/* After file selected */}
           {state.file && (
             <>
               <FilePreview file={state.file} />
               <JobDescriptionInput value={state.jobDescription} onChange={actions.setJobDescription} />
             </>
           )}
-          {!state.file && <EmptyState />}
+
           {actionBar}
         </div>
       );
@@ -80,6 +94,7 @@ export default function StateRouter({ state, actions }: StateRouterProps) {
             <StreamingIndicator
               chunkCount={state.streamedChunks.length}
               startTime={state.requestStartTime}
+              analysisStage={state.analysisStage}
             />
           )}
           {actionBar}
@@ -135,3 +150,4 @@ export default function StateRouter({ state, actions }: StateRouterProps) {
       );
   }
 }
+

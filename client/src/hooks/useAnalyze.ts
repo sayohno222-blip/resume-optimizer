@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useCallback, useRef } from 'react';
+﻿import { useReducer, useEffect, useCallback, useRef } from 'react';
 import type { MachineState, MachineAction } from '../types';
 import { createInitialState } from '../types';
 import { runMockAnalysis } from '../services/mockAnalyzer';
@@ -9,6 +9,7 @@ function enterUploading(state: MachineState): MachineState {
   return {
     ...state,
     status: 'uploading',
+    analysisStage: 0,
     error: null,
     streamedChunks: [],
     lastChunkId: -1,
@@ -84,6 +85,9 @@ function machineReducer(state: MachineState, action: MachineAction): MachineStat
     case 'TOGGLE_DEBUG':
       return { ...state, debugEnabled: !state.debugEnabled };
 
+    case 'SET_ANALYSIS_STAGE':
+      return { ...state, analysisStage: action.stage };
+
     default:
       return state;
   }
@@ -95,6 +99,7 @@ export function useAnalyze() {
   const [state, dispatch] = useReducer(machineReducer, null, createInitialState);
   const abortRef = useRef(false);
 
+  // Mock analysis effect
   useEffect(() => {
     if (state.status !== 'uploading') return;
     if (!state.file) return;
@@ -115,6 +120,29 @@ export function useAnalyze() {
 
     return () => {
       abortRef.current = true;
+    };
+  }, [state.requestId]);
+
+  // Stage progression timer
+  useEffect(() => {
+    if (state.status !== 'uploading') return;
+
+    dispatch({ type: 'SET_ANALYSIS_STAGE', stage: 1 });
+
+    const timer1 = setTimeout(() => {
+      if (!abortRef.current) dispatch({ type: 'SET_ANALYSIS_STAGE', stage: 2 });
+    }, 1200);
+    const timer2 = setTimeout(() => {
+      if (!abortRef.current) dispatch({ type: 'SET_ANALYSIS_STAGE', stage: 3 });
+    }, 2800);
+    const timer3 = setTimeout(() => {
+      if (!abortRef.current) dispatch({ type: 'SET_ANALYSIS_STAGE', stage: 4 });
+    }, 4200);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
     };
   }, [state.requestId]);
 
