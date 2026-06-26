@@ -1,7 +1,10 @@
-node_modules/
+﻿node_modules/
 dist/
 .env
 server/uploads/*
 !server/uploads/.gitkeep
 
 .vercel
+*.tsbuildinfo
+client/src/**/*.js
+client/package-lock.json
