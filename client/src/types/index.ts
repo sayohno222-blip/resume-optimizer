@@ -1,4 +1,4 @@
-export interface CategoryScore {
+﻿export interface CategoryScore {
   score: number;
   label: string;
   maxScore: number;
@@ -9,6 +9,9 @@ export interface FeedbackItem {
   category: 'format' | 'keywords' | 'structure' | 'content';
   message: string;
   suggestion: string;
+  impact?: string;
+  exampleBefore?: string;
+  exampleAfter?: string;
 }
 
 export interface KeywordAnalysis {

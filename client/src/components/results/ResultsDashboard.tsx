@@ -3,6 +3,7 @@ import ScoreGauge from './ScoreGauge';
 import CategoryBreakdown from './CategoryBreakdown';
 import KeywordAnalysis from './KeywordAnalysis';
 import FeedbackList from './FeedbackList';
+import BeforeAfterComparison from './BeforeAfterComparison';
 import { IS_MOCK, MOCK_BANNER_TEXT } from '../../config';
 
 interface ResultsDashboardProps {
@@ -51,6 +52,11 @@ export default function ResultsDashboard({ result, onReset }: ResultsDashboardPr
         <div className="bg-white rounded-2xl border p-6">
           <KeywordAnalysis keywords={result.keywords} />
         </div>
+      </div>
+
+      {/* Before / After Comparison */}
+      <div className="bg-white rounded-2xl border p-6">
+        <BeforeAfterComparison feedback={result.feedback} />
       </div>
 
       {/* Feedback */}

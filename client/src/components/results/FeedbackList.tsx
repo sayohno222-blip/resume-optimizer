@@ -1,4 +1,5 @@
 ﻿import type { FeedbackItem } from '../../types';
+import CopyButton from './CopyButton';
 
 interface FeedbackListProps {
   feedback: FeedbackItem[];
@@ -44,10 +45,10 @@ export default function FeedbackList({ feedback }: FeedbackListProps) {
           return (
             <div
               key={i}
-              className={`border-l-4 rounded-lg bg-white border ${s.border} p-4`}
+              className={`border-l-4 rounded-lg bg-white border ${s.border} p-4 md:p-5`}
             >
               {/* Header: severity badge + category */}
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-3">
                 <span className={`text-xs font-medium px-2 py-0.5 rounded ${s.badge}`}>
                   {s.label}
                 </span>
@@ -55,15 +56,55 @@ export default function FeedbackList({ feedback }: FeedbackListProps) {
                   {categoryLabel[item.category] ?? item.category}
                 </span>
               </div>
-              {/* Problem (message) */}
-              <p className="text-sm text-gray-800 mb-1.5">{item.message}</p>
-              {/* Suggestion */}
-              <div className="flex items-start gap-1.5">
-                <svg className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p className="text-sm text-gray-500">{item.suggestion}</p>
+
+              {/* Problem */}
+              <div className="mb-2">
+                <p className="text-sm text-gray-800">
+                  <span className="font-medium text-gray-900">问题：</span>
+                  {item.message}
+                </p>
               </div>
+
+              {/* Impact */}
+              {item.impact && (
+                <div className="mb-2">
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium text-gray-700">影响：</span>
+                    {item.impact}
+                  </p>
+                </div>
+              )}
+
+              {/* Suggestion */}
+              <div className="mb-3">
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium text-gray-700">修改建议：</span>
+                  {item.suggestion}
+                </p>
+              </div>
+
+              {/* Example rewrite */}
+              {item.exampleBefore && item.exampleAfter && (
+                <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+                  <div>
+                    <span className="text-xs font-medium text-gray-400">原始表达</span>
+                    <p className="text-sm text-gray-600 mt-0.5 line-through decoration-gray-300">
+                      {item.exampleBefore}
+                    </p>
+                  </div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <span className="text-xs font-medium text-green-600">优化后表达</span>
+                      <p className="text-sm text-gray-800 mt-0.5">
+                        {item.exampleAfter}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0 mt-3">
+                      <CopyButton text={item.exampleAfter} label="复制" />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
@@ -71,4 +112,3 @@ export default function FeedbackList({ feedback }: FeedbackListProps) {
     </div>
   );
 }
-
