@@ -2,6 +2,8 @@
 import type { MachineState, MachineAction } from '../types';
 import { createInitialState } from '../types';
 import { runMockAnalysis } from '../services/mockAnalyzer';
+import { analyzeResumeWithApi } from '../services/apiAnalyzer';
+import { IS_MOCK, ENABLE_API_ANALYSIS } from '../config';
 
 // --- Pure Reducer ---
 
@@ -99,31 +101,62 @@ export function useAnalyze() {
   const [state, dispatch] = useReducer(machineReducer, null, createInitialState);
   const abortRef = useRef(false);
 
-  // Mock analysis effect
+  // Analysis effect — supports both mock and API modes
   useEffect(() => {
     if (state.status !== 'uploading') return;
     if (!state.file) return;
 
     abortRef.current = false;
 
-    runMockAnalysis({
-      onChunk(chunk, id) {
-        if (!abortRef.current) dispatch({ type: 'CHUNK_RECEIVED', chunk, chunkId: id });
-      },
-      onComplete(result) {
-        if (!abortRef.current) dispatch({ type: 'STREAM_COMPLETE', result });
-      },
-      onProgress(_progress) {
-        // progress info already conveyed by chunk count in UI
-      },
-    });
+    const runAnalysis = async () => {
+      // Mode selection: API first if enabled, fallback to mock
+      const useApi = ENABLE_API_ANALYSIS && !IS_MOCK;
+
+      if (useApi) {
+        await analyzeResumeWithApi(state.file!, state.jobDescription, {
+          onStage(stage) {
+            if (!abortRef.current) dispatch({ type: 'SET_ANALYSIS_STAGE', stage });
+          },
+          onComplete(result) {
+            if (!abortRef.current) dispatch({ type: 'STREAM_COMPLETE', result });
+          },
+          onError(err) {
+            // API failed — fall back to mock analysis
+            // Comment: Remove this fallback when API is stable and always available
+            console.warn('API analysis failed, falling back to mock:', err.message);
+            runMockAnalysis({
+              onChunk(chunk, id) {
+                if (!abortRef.current) dispatch({ type: 'CHUNK_RECEIVED', chunk, chunkId: id });
+              },
+              onComplete(result) {
+                if (!abortRef.current) dispatch({ type: 'STREAM_COMPLETE', result });
+              },
+              onProgress() {},
+            });
+          },
+        });
+      } else {
+        // Mock mode
+        runMockAnalysis({
+          onChunk(chunk, id) {
+            if (!abortRef.current) dispatch({ type: 'CHUNK_RECEIVED', chunk, chunkId: id });
+          },
+          onComplete(result) {
+            if (!abortRef.current) dispatch({ type: 'STREAM_COMPLETE', result });
+          },
+          onProgress() {},
+        });
+      }
+    };
+
+    runAnalysis();
 
     return () => {
       abortRef.current = true;
     };
   }, [state.requestId]);
 
-  // Stage progression timer
+  // Stage progression timer (used in mock mode; API mode drives its own stages)
   useEffect(() => {
     if (state.status !== 'uploading') return;
 
