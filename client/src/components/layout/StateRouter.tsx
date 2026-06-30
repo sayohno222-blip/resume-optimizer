@@ -1,153 +1,117 @@
-﻿import type { MachineState } from '../../types';
-import FileUploader from '../upload/FileUploader';
-import FilePreview from '../upload/FilePreview';
-import JobDescriptionInput from '../upload/JobDescriptionInput';
-import ResultsDashboard from '../results/ResultsDashboard';
-import LoadingOverlay from '../common/LoadingOverlay';
-import ErrorBanner from '../common/ErrorBanner';
-import CircuitBreakerBanner from '../common/CircuitBreakerBanner';
-import EmptyState from '../common/EmptyState';
-import StreamingIndicator from '../streaming/StreamingIndicator';
-import ProgressiveResult from '../streaming/ProgressiveResult';
-import ReconnectingOverlay from '../streaming/ReconnectingOverlay';
-import ActionBar from './ActionBar';
+import type { BionicState } from '../../hooks/useBionicDesign';
+import type { BionicInput } from '../../types/bionic';
+import BionicDesignForm from '../bionic/BionicDesignForm';
+import BionicDesignResults from '../bionic/BionicDesignResults';
 
 interface StateRouterProps {
-  state: MachineState;
+  state: BionicState;
   actions: {
-    setFile: (f: File | null) => void;
-    setJobDescription: (jd: string) => void;
-    analyze: () => void;
-    abort: () => void;
-    retry: () => void;
-    regenerate: () => void;
+    setInput: (input: Partial<BionicInput>) => void;
+    submit: () => void;
     reset: () => void;
-    toggleDebug: () => void;
   };
 }
 
-export default function StateRouter({ state, actions }: StateRouterProps) {
-  const actionBar = (
-    <ActionBar
-      status={state.status}
-      hasFile={state.file !== null}
-      circuitOpen={state.circuitOpen}
-      onAnalyze={actions.analyze}
-      onAbort={actions.abort}
-      onRetry={actions.retry}
-      onRegenerate={actions.regenerate}
-      onReset={actions.reset}
-    />
+function LoadingView({ stage, label }: { stage: number; label: string }) {
+  const stages = [
+    { label: '正在分析灵感来源...' },
+    { label: '正在提取形态与结构特征...' },
+    { label: '正在生成设计方案...' },
+    { label: '正在完善设计说明...' },
+  ];
+  return (
+    <div className='flex flex-col items-center justify-center py-24'>
+      <div className='w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin' />
+      <p className='mt-6 text-gray-600 font-medium'>正在生成设计方案</p>
+      <p className='text-sm text-gray-400 mt-1'>
+        {label || 'AI 正在从生物特征中提取设计灵感，请稍候'}
+      </p>
+      <div className='mt-8 w-full max-w-sm space-y-3'>
+        {stages.map((s, i) => {
+          const idx = i + 1;
+          return (
+            <div key={i} className='flex items-center gap-3'>
+              <div
+                className={[
+                  'w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-colors',
+                  stage > idx ? 'bg-blue-500 text-white' : '',
+                  stage === idx ? 'bg-blue-500 text-white animate-pulse' : '',
+                  stage < idx ? 'bg-gray-100 text-gray-300' : '',
+                ].join(' ')}
+              >
+                {stage > idx ? (
+                  <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2.5} d='M5 13l4 4L19 7' />
+                  </svg>
+                ) : (
+                  <span className='text-xs font-medium'>{idx}</span>
+                )}
+              </div>
+              <span
+                className={[
+                  'text-sm transition-colors',
+                  stage === idx ? 'text-gray-900 font-medium' : '',
+                  stage > idx ? 'text-gray-500' : '',
+                  stage < idx ? 'text-gray-400' : '',
+                ].join(' ')}
+              >
+                {s.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
-
-  switch (state.status) {
-    // --- idle ---
-    case 'idle':
-      return (
-        <div className="space-y-6">
-          {/* Hero Section */}
-          <div className="text-center mb-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">
-              用 AI 优化你的简历
-            </h1>
-            <p className="text-gray-500 max-w-xl mx-auto leading-relaxed text-sm md:text-base">
-              上传简历，AI 自动分析 ATS 兼容性，检测关键词匹配度，
-              <br className="hidden sm:block" />
-              帮你提升面试通过率
-            </p>
-          </div>
-
-          {/* 3-step flow */}
-          {!state.file && <EmptyState />}
-
-          {/* Upload */}
-          <FileUploader file={state.file} onFile={actions.setFile} />
-
-          {/* After file selected */}
-          {state.file && (
-            <>
-              <FilePreview file={state.file} />
-              <JobDescriptionInput value={state.jobDescription} onChange={actions.setJobDescription} />
-            </>
-          )}
-
-          {actionBar}
-        </div>
-      );
-
-    // --- uploading ---
-    case 'uploading':
-      return (
-        <div className="space-y-6">
-          <LoadingOverlay />
-          {actionBar}
-        </div>
-      );
-
-    // --- streaming ---
-    case 'streaming':
-      return (
-        <div className="space-y-6">
-          {state.streamedChunks.length > 0 ? (
-            <ProgressiveResult chunks={state.streamedChunks} />
-          ) : (
-            <StreamingIndicator
-              chunkCount={state.streamedChunks.length}
-              startTime={state.requestStartTime}
-              analysisStage={state.analysisStage}
-            />
-          )}
-          {actionBar}
-        </div>
-      );
-
-    // --- reconnecting ---
-    case 'reconnecting':
-      return (
-        <div className="space-y-6">
-          <ReconnectingOverlay
-            attempt={state.reconnectAttempt}
-            maxAttempts={3}
-          />
-          {actionBar}
-        </div>
-      );
-
-    // --- success ---
-    case 'success':
-      return (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">分析报告</h2>
-          </div>
-          {state.result && <ResultsDashboard result={state.result} onReset={actions.reset} />}
-          {actionBar}
-        </div>
-      );
-
-    // --- error ---
-    case 'error':
-      return (
-        <div className="space-y-6">
-          {state.error && <ErrorBanner error={state.error} />}
-          {state.circuitOpen && <CircuitBreakerBanner openUntil={state.circuitOpenUntil} />}
-          {actionBar}
-        </div>
-      );
-
-    // --- aborted ---
-    case 'aborted':
-      return (
-        <div className="space-y-4 text-center py-12">
-          <div className="w-12 h-12 rounded-full bg-gray-100 mx-auto flex items-center justify-center">
-            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </div>
-          <p className="text-gray-600 font-medium">分析已取消</p>
-          {actionBar}
-        </div>
-      );
-  }
 }
 
+function ErrorView({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className='flex flex-col items-center justify-center py-24'>
+      <div className='w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4'>
+        <svg className='w-6 h-6 text-red-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z' />
+        </svg>
+      </div>
+      <p className='text-gray-900 font-semibold mb-1'>生成失败</p>
+      <p className='text-sm text-gray-500 mb-6'>{message}</p>
+      <button
+        onClick={onRetry}
+        className='px-6 py-2.5 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors cursor-pointer'
+      >
+        重试
+      </button>
+    </div>
+  );
+}
+
+export default function StateRouter({ state, actions }: StateRouterProps) {
+  switch (state.status) {
+    case 'idle':
+      return (
+        <BionicDesignForm
+          input={state.input}
+          status={state.status}
+          onInput={actions.setInput}
+          onSubmit={actions.submit}
+        />
+      );
+    case 'uploading':
+      return (
+        <LoadingView stage={state.analysisStage} label={state.analysisLabel} />
+      );
+    case 'success':
+      return state.result ? (
+        <BionicDesignResults result={state.result} onReset={actions.reset} />
+      ) : null;
+    case 'error':
+      return (
+        <ErrorView
+          message={state.error || '发生未知错误，请重试'}
+          onRetry={actions.submit}
+        />
+      );
+    default:
+      return null;
+  }
+}

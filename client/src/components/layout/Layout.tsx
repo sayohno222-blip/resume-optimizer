@@ -1,51 +1,28 @@
-﻿import { useAnalyze } from '../../hooks/useAnalyze';
+﻿import { useBionicDesign } from '../../hooks/useBionicDesign';
 import StateRouter from './StateRouter';
-import DebugPanel from '../debug/DebugPanel';
-import { IS_MOCK, MOCK_BANNER_TEXT } from '../../config';
 
 export default function Layout() {
-  const { state, actions } = useAnalyze();
+  const { state, actions } = useBionicDesign();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
-              A
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-sm">
+              🦋
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">ATS Resume Optimizer</h1>
-              <p className="text-xs text-gray-500">简历 ATS 兼容性分析工具</p>
+              <h1 className="text-lg font-semibold text-gray-900">AI Design Assistant</h1>
+              <p className="text-xs text-gray-500">仿生产品设计助手</p>
             </div>
           </div>
-          {!import.meta.env.PROD && (
-            <button
-              onClick={actions.toggleDebug}
-              className="text-xs text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-            >
-              {state.debugEnabled ? '关闭调试' : '调试'}
-            </button>
-          )}
         </div>
       </header>
-
-      {/* Mock demo banner */}
-      {IS_MOCK && (
-        <div className="border-b bg-amber-50/60">
-          <div className="max-w-4xl mx-auto px-6 py-1.5 text-xs text-amber-700 text-center">
-            {MOCK_BANNER_TEXT}
-          </div>
-        </div>
-      )}
 
       <main className="max-w-4xl mx-auto px-6 py-8">
         <StateRouter state={state} actions={actions} />
       </main>
-
-      {!import.meta.env.PROD && state.debugEnabled && (
-        <DebugPanel state={state} onClose={actions.toggleDebug} />
-      )}
     </div>
   );
 }
