@@ -1,11 +1,11 @@
 {
-  "buildCommand": "cd client && npm install && npx vite build",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd client && npm install && npm run build",
   "outputDirectory": "client/dist",
   "rewrites": [
-<<<<<<< HEAD
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-=======
->>>>>>> parent of 98cd802 (feat: add DeepSeek API analysis)
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
