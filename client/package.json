@@ -12,7 +12,7 @@
     "axios": "^1.7.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-dropzone": "^14.3.0"
+    "react-dropzone": "^19.0.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.0",
