@@ -7,7 +7,6 @@ server/uploads/*
 .vercel
 *.tsbuildinfo
 client/src/**/*.js
-client/package-lock.json
 server/node_modules/
 .DS_Store
 *.log
