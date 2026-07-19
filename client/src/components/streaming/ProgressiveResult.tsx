@@ -134,7 +134,7 @@ export default function ProgressiveResult({ chunks }: ProgressiveResultProps) {
         <div className="flex items-center gap-4 mb-4">
           <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin flex-shrink-0" />
           <div className="flex-1">
-            <h3 className="font-semibold text-gray-900">AI 正在分析...</h3>
+            <h3 className="font-semibold text-gray-900">正在进行规则分析...</h3>
             <div className="mt-2 h-2 bg-gray-100 rounded-full overflow-hidden">
               <div
                 className="h-full bg-blue-500 rounded-full transition-all duration-500"

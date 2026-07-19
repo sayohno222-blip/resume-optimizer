@@ -4,7 +4,7 @@ import CategoryBreakdown from './CategoryBreakdown';
 import KeywordAnalysis from './KeywordAnalysis';
 import FeedbackList from './FeedbackList';
 import BeforeAfterComparison from './BeforeAfterComparison';
-import { IS_MOCK, MOCK_BANNER_TEXT } from '../../config';
+import { ANALYSIS_MODE_LABEL, RESULT_DISCLAIMER } from '../../config';
 
 interface ResultsDashboardProps {
   result: AnalysisResult;
@@ -12,17 +12,17 @@ interface ResultsDashboardProps {
 }
 
 export default function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
+  const hasBeforeAfterExamples = result.feedback.some((item) => item.exampleBefore && item.exampleAfter);
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-bold text-gray-900">分析报告</h2>
-          {IS_MOCK && (
-            <span className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-0.5">
-              演示版本
-            </span>
-          )}
+          <span className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
+            {ANALYSIS_MODE_LABEL}
+          </span>
         </div>
         <button
           onClick={onReset}
@@ -55,23 +55,20 @@ export default function ResultsDashboard({ result, onReset }: ResultsDashboardPr
       </div>
 
       {/* Before / After Comparison */}
-      <div className="bg-white rounded-2xl border p-6">
-        <BeforeAfterComparison feedback={result.feedback} />
-      </div>
+      {hasBeforeAfterExamples && (
+        <div className="bg-white rounded-2xl border p-6">
+          <BeforeAfterComparison feedback={result.feedback} />
+        </div>
+      )}
 
       {/* Feedback */}
       <div className="bg-white rounded-2xl border p-6">
         <FeedbackList feedback={result.feedback} />
       </div>
 
-      {/* Demo notice */}
-      {IS_MOCK && (
-        <div className="text-center">
-          <p className="text-xs text-gray-400">
-            {MOCK_BANNER_TEXT}
-          </p>
-        </div>
-      )}
+      <div className="text-center">
+        <p className="text-xs text-gray-400">{RESULT_DISCLAIMER}</p>
+      </div>
     </div>
   );
 }

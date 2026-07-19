@@ -1,7 +1,4 @@
-﻿// Mock mode — IS_MOCK=true uses mockAnalyzer, no API calls
-// Public API analysis stays disabled until authentication and rate limiting are in place.
-export const SITE_TITLE = "ATS Resume Optimizer";
-export const IS_MOCK = true;
-export const ENABLE_API_ANALYSIS = false;
-export const API_ANALYZE_ENDPOINT = "/api/analyze";
-export const MOCK_BANNER_TEXT = "当前为演示版本，分析结果用于展示产品流程";
+export const SITE_TITLE = 'ATS Resume Optimizer';
+export const ANALYSIS_MODE_LABEL = '本地规则分析';
+export const PRIVACY_NOTICE = '隐私模式：简历只在当前浏览器中解析，不会上传或保存';
+export const RESULT_DISCLAIMER = '结果由公开规则生成，仅供简历自查，不代表企业 ATS 或招聘结论';
