@@ -5,8 +5,5 @@
   "scripts": {
     "dev": "cd client && npx vite",
     "build": "cd client && npx vite build"
-  },
-  "devDependencies": {
-    "concurrently": "^9.1.0"
   }
 }
