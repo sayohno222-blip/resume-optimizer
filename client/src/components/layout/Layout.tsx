@@ -1,7 +1,7 @@
 ﻿import { useAnalyze } from '../../hooks/useAnalyze';
 import StateRouter from './StateRouter';
 import DebugPanel from '../debug/DebugPanel';
-import { IS_MOCK, MOCK_BANNER_TEXT } from '../../config';
+import { PRIVACY_NOTICE } from '../../config';
 
 export default function Layout() {
   const { state, actions } = useAnalyze();
@@ -30,14 +30,11 @@ export default function Layout() {
         </div>
       </header>
 
-      {/* Mock demo banner */}
-      {IS_MOCK && (
-        <div className="border-b bg-amber-50/60">
-          <div className="max-w-4xl mx-auto px-6 py-1.5 text-xs text-amber-700 text-center">
-            {MOCK_BANNER_TEXT}
-          </div>
+      <div className="border-b bg-emerald-50/70">
+        <div className="max-w-4xl mx-auto px-6 py-2 text-xs text-emerald-800 text-center">
+          {PRIVACY_NOTICE}
         </div>
-      )}
+      </div>
 
       <main className="max-w-4xl mx-auto px-6 py-8">
         <StateRouter state={state} actions={actions} />

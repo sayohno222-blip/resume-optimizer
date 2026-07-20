@@ -48,12 +48,12 @@ export default function StateRouter({ state, actions }: StateRouterProps) {
           {/* Hero Section */}
           <div className="text-center mb-4">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">
-              用 AI 优化你的简历
+              检查简历的 ATS 兼容性
             </h1>
             <p className="text-gray-500 max-w-xl mx-auto leading-relaxed text-sm md:text-base">
-              上传简历，AI 自动分析 ATS 兼容性，检测关键词匹配度，
+              在浏览器本地读取简历，检查结构、内容与岗位关键词，
               <br className="hidden sm:block" />
-              帮你提升面试通过率
+              不上传文件，也不使用第三方 AI 接口
             </p>
           </div>
 
@@ -79,7 +79,7 @@ export default function StateRouter({ state, actions }: StateRouterProps) {
     case 'uploading':
       return (
         <div className="space-y-6">
-          <LoadingOverlay />
+          <LoadingOverlay stage={state.analysisStage} />
           {actionBar}
         </div>
       );
@@ -150,4 +150,3 @@ export default function StateRouter({ state, actions }: StateRouterProps) {
       );
   }
 }
-

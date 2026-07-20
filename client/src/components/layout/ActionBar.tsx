@@ -35,7 +35,7 @@ export default function ActionBar({
       buttons.push({ label: status === 'reconnecting' ? '取消重连' : '停止', action: onAbort, style: 'bg-red-600 hover:bg-red-700 text-white' });
       break;
     case 'success':
-      buttons.push({ label: '重新生成', action: onRegenerate, style: 'bg-blue-600 hover:bg-blue-700 text-white' });
+      buttons.push({ label: '重新分析', action: onRegenerate, style: 'bg-blue-600 hover:bg-blue-700 text-white' });
       buttons.push({ label: '分析新简历', action: onReset, style: 'bg-gray-100 hover:bg-gray-200 text-gray-700' });
       break;
     case 'error':
